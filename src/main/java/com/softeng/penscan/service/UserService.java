@@ -42,4 +42,13 @@ public class UserService {
     public User getUserByUsername(String username) {
         return (User) userRepository.findByUsername(username);
     }
+
+    public String getUserTypeByUsername(String username) {
+        User user = (User) userRepository.findByUsername(username);
+        if (user != null) {
+            return user.getUserType();
+        } else {
+            return null;
+        }
+    }
 }

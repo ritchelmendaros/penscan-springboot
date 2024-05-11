@@ -46,7 +46,17 @@ public class UserController {
     public ResponseEntity<String> getUserId(@RequestParam("username") String username) {
         User user = userService.getUserByUsername(username);
         if (user != null) {
-            return ResponseEntity.ok("User ID: " + user.getUserid());
+            return ResponseEntity.ok(user.getUserid());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+    }
+
+    @GetMapping("/getusertype")
+    public ResponseEntity<String> getUserType(@RequestParam("username") String username) {
+        String userType = userService.getUserTypeByUsername(username);
+        if (userType != null) {
+            return ResponseEntity.ok(userType);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
