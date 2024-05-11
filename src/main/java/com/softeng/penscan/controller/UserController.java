@@ -29,4 +29,13 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User registration failed");
         }
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody User user) {
+        if (userService.loginUser(user.getUsername(), user.getPassword())) {
+            return ResponseEntity.ok("User logged in successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+        }
+    }
 }
