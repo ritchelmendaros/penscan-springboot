@@ -1,0 +1,17 @@
+package com.softeng.penscan.service;
+
+import com.softeng.penscan.model.Classes;
+import com.softeng.penscan.repository.ClassesRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ClassesService {
+
+    @Autowired
+    private ClassesRepository classesRepository;
+
+    public Classes addClass(Classes classes) {
+        return classesRepository.save(classes);
+    }
+}
