@@ -16,4 +16,10 @@ public class ClassesController {
     public Classes addClass(@RequestBody Classes classes) {
         return classesService.addClass(classes);
     }
+
+    @GetMapping("/getclassbyteacherid")
+    public Classes getClassByTeacherId(@RequestParam("teacherid") String teacherid) {
+        return classesService.getClassByTeacherId(teacherid);
+    }
+
 }

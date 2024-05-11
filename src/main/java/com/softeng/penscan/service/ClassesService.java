@@ -14,4 +14,8 @@ public class ClassesService {
     public Classes addClass(Classes classes) {
         return classesRepository.save(classes);
     }
+
+    public Classes getClassByTeacherId(String teacherid) {
+        return classesRepository.findByTeacherid(teacherid);
+    }
 }
