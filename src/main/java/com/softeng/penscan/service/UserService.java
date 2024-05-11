@@ -38,4 +38,8 @@ public class UserService {
         }
         return passwordEncoder.matches(password, user.getPassword());
     }
+
+    public User getUserByUsername(String username) {
+        return (User) userRepository.findByUsername(username);
+    }
 }
