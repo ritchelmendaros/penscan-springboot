@@ -30,4 +30,5 @@ public class ClassesController {
             @RequestParam("teacherid") String teacherid) {
         return classesService.checkClass(classname, teacherid);
     }
+
 }

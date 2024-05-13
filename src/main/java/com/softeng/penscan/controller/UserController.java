@@ -2,6 +2,8 @@ package com.softeng.penscan.controller;
 
 import com.softeng.penscan.model.User;
 import com.softeng.penscan.service.UserService;
+import java.util.Collections;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +60,16 @@ public class UserController {
             return ResponseEntity.ok(userType);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+    }
+
+    @GetMapping("/getallstudents")
+    public ResponseEntity<List<User>> getAllStudents() {
+        List<User> students = userService.getUsersByType("Student");
+        if (!students.isEmpty()) {
+            return ResponseEntity.ok(students);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
         }
     }
 

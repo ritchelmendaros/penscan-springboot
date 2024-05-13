@@ -2,6 +2,9 @@ package com.softeng.penscan.service;
 
 import com.softeng.penscan.model.User;
 import com.softeng.penscan.repository.UserRepository;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -50,5 +53,9 @@ public class UserService {
         } else {
             return null;
         }
+    }
+
+    public List<User> getUsersByType(String userType) {
+        return userRepository.findByUserType(userType);
     }
 }
