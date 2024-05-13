@@ -1,6 +1,8 @@
 package com.softeng.penscan.service;
 
+import com.softeng.penscan.model.Classes;
 import com.softeng.penscan.model.Student;
+import com.softeng.penscan.repository.ClassesRepository;
 import com.softeng.penscan.repository.StudentRepository;
 
 import java.util.List;
@@ -15,6 +17,9 @@ public class StudentService {
     @Autowired
     private StudentRepository studentRepository;
 
+    @Autowired
+    private ClassesRepository classesRepository;
+
     public Student addStudent(Student student) {
         return studentRepository.save(student);
     }
@@ -24,5 +29,9 @@ public class StudentService {
         return students.stream()
                 .map(Student::getClassesid)
                 .collect(Collectors.toList());
+    }
+
+    public Classes getClassDetails(String classId) {
+        return classesRepository.findById(classId).orElse(null);
     }
 }

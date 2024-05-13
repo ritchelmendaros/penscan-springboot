@@ -1,8 +1,10 @@
 package com.softeng.penscan.controller;
 
+import com.softeng.penscan.model.Classes;
 import com.softeng.penscan.model.Student;
 import com.softeng.penscan.service.StudentService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,23 @@ public class StudentController {
             return ResponseEntity.ok(classIds);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(classIds);
+        }
+    }
+
+    @GetMapping("/getclassdetailsbyuserid")
+    public ResponseEntity<List<Classes>> getClassDetailsByUserId(@RequestParam("studentid") String userid) {
+        List<String> classIds = studentService.getClassIdsByUserId(userid);
+        List<Classes> classDetails = new ArrayList<>();
+        for (String classId : classIds) {
+            Classes classDetail = studentService.getClassDetails(classId);
+            if (classDetail != null) {
+                classDetails.add(classDetail);
+            }
+        }
+        if (!classDetails.isEmpty()) {
+            return ResponseEntity.ok(classDetails);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(classDetails);
         }
     }
 }
