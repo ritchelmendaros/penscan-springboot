@@ -2,6 +2,9 @@ package com.softeng.penscan.controller;
 
 import com.softeng.penscan.model.Student;
 import com.softeng.penscan.service.StudentService;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,5 +21,15 @@ public class StudentController {
     public ResponseEntity<Student> addStudent(@RequestBody Student student) {
         Student addedStudent = studentService.addStudent(student);
         return new ResponseEntity<>(addedStudent, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/getclassidbyuserid")
+    public ResponseEntity<List<String>> getClassesByUserId(@RequestParam("studentid") String userid) {
+        List<String> classIds = studentService.getClassIdsByUserId(userid);
+        if (!classIds.isEmpty()) {
+            return ResponseEntity.ok(classIds);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(classIds);
+        }
     }
 }
