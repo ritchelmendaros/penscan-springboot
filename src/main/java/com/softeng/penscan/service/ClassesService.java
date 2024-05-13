@@ -25,4 +25,8 @@ public class ClassesService {
     public boolean checkClass(String classname, String teacherid) {
         return classesRepository.existsByClassnameAndTeacherid(classname, teacherid);
     }
+
+    public Classes getClassDetails(String classid) {
+        return classesRepository.findById(classid).orElse(null);
+    }
 }
