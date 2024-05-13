@@ -21,4 +21,8 @@ public class ClassesService {
     public List<Classes> getClassesByTeacherId(String teacherid) {
         return classesRepository.findAllByTeacherid(teacherid);
     }
+
+    public boolean checkClass(String classname, String teacherid) {
+        return classesRepository.existsByClassnameAndTeacherid(classname, teacherid);
+    }
 }

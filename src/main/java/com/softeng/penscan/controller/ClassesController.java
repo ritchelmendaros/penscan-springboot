@@ -24,4 +24,10 @@ public class ClassesController {
     public List<Classes> getClassesByTeacherId(@RequestParam("teacherid") String teacherid) {
         return classesService.getClassesByTeacherId(teacherid);
     }
+
+    @GetMapping("/checkclass")
+    public boolean checkClass(@RequestParam("classname") String classname,
+            @RequestParam("teacherid") String teacherid) {
+        return classesService.checkClass(classname, teacherid);
+    }
 }

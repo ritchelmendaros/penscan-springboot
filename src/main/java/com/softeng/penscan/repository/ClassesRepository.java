@@ -13,4 +13,6 @@ public interface ClassesRepository extends MongoRepository<Classes, String> {
     Classes findByTeacherid(String teacherid);
 
     List<Classes> findAllByTeacherid(String teacherid);
+
+    boolean existsByClassnameAndTeacherid(String classname, String teacherid);
 }
