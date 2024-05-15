@@ -4,10 +4,6 @@ import com.softeng.penscan.model.Class;
 import com.softeng.penscan.model.Student;
 import com.softeng.penscan.repository.ClassRepository;
 import com.softeng.penscan.repository.StudentRepository;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

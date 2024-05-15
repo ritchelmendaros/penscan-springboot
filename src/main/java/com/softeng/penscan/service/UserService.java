@@ -1,11 +1,14 @@
 package com.softeng.penscan.service;
 
+import com.softeng.penscan.model.Student;
+import com.softeng.penscan.model.Teacher;
 import com.softeng.penscan.model.User;
+import com.softeng.penscan.repository.StudentRepository;
+import com.softeng.penscan.repository.TeacherRepository;
 import com.softeng.penscan.repository.UserRepository;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -14,12 +17,29 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
 
-    @Autowired
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,
+            TeacherRepository teacherRepository, StudentRepository studentRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.teacherRepository = teacherRepository;
+        this.studentRepository = studentRepository;
     }
+
+    // public boolean registerUser(User user) {
+    // if (userRepository.findByUsername(user.getUsername()) != null) {
+    // return false;
+    // }
+
+    // String hashedPassword = passwordEncoder.encode(user.getPassword());
+    // user.setPassword(hashedPassword);
+
+    // userRepository.save(user);
+
+    // return true;
+    // }
 
     public boolean registerUser(User user) {
         if (userRepository.findByUsername(user.getUsername()) != null) {
@@ -29,7 +49,19 @@ public class UserService {
         String hashedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(hashedPassword);
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        if (savedUser.getUserType().equalsIgnoreCase("teacher")) {
+            Teacher teacher = new Teacher();
+            teacher.setUserid(savedUser.getUserid());
+            teacherRepository.save(teacher);
+        } else if (savedUser.getUserType().equalsIgnoreCase("student")) {
+            Student student = new Student();
+            student.setUserid(savedUser.getUserid());
+            student.setClassid(null);
+            student.setQuizid(null);
+            studentRepository.save(student);
+        }
 
         return true;
     }

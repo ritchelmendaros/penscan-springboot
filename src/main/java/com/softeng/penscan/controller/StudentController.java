@@ -1,11 +1,7 @@
 package com.softeng.penscan.controller;
 
-import com.softeng.penscan.model.Class;
 import com.softeng.penscan.model.Student;
 import com.softeng.penscan.service.StudentService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
