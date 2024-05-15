@@ -25,30 +25,32 @@ public class StudentController {
         return new ResponseEntity<>(addedStudent, HttpStatus.CREATED);
     }
 
-    @GetMapping("/getclassidbyuserid")
-    public ResponseEntity<List<String>> getClassesByUserId(@RequestParam("studentid") String userid) {
-        List<String> classIds = studentService.getClassIdsByUserId(userid);
-        if (!classIds.isEmpty()) {
-            return ResponseEntity.ok(classIds);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(classIds);
-        }
-    }
+    // @GetMapping("/getclassidbyuserid")
+    // public ResponseEntity<List<String>>
+    // getClassesByUserId(@RequestParam("studentid") String userid) {
+    // List<String> classIds = studentService.getClassIdsByUserId(userid);
+    // if (!classIds.isEmpty()) {
+    // return ResponseEntity.ok(classIds);
+    // } else {
+    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(classIds);
+    // }
+    // }
 
-    @GetMapping("/getclassdetailsbyuserid")
-    public ResponseEntity<List<Classes>> getClassDetailsByUserId(@RequestParam("studentid") String userid) {
-        List<String> classIds = studentService.getClassIdsByUserId(userid);
-        List<Classes> classDetails = new ArrayList<>();
-        for (String classId : classIds) {
-            Classes classDetail = studentService.getClassDetails(classId);
-            if (classDetail != null) {
-                classDetails.add(classDetail);
-            }
-        }
-        if (!classDetails.isEmpty()) {
-            return ResponseEntity.ok(classDetails);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(classDetails);
-        }
-    }
+    // @GetMapping("/getclassdetailsbyuserid")
+    // public ResponseEntity<List<Classes>>
+    // getClassDetailsByUserId(@RequestParam("studentid") String userid) {
+    // List<String> classIds = studentService.getClassIdsByUserId(userid);
+    // List<Classes> classDetails = new ArrayList<>();
+    // for (String classId : classIds) {
+    // Classes classDetail = studentService.getClassDetails(classId);
+    // if (classDetail != null) {
+    // classDetails.add(classDetail);
+    // }
+    // }
+    // if (!classDetails.isEmpty()) {
+    // return ResponseEntity.ok(classDetails);
+    // } else {
+    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(classDetails);
+    // }
+    // }
 }

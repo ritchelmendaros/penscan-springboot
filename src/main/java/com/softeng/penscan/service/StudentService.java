@@ -24,12 +24,12 @@ public class StudentService {
         return studentRepository.save(student);
     }
 
-    public List<String> getClassIdsByUserId(String userid) {
-        List<Student> students = studentRepository.findByUserid(userid);
-        return students.stream()
-                .map(Student::getClassesid)
-                .collect(Collectors.toList());
-    }
+    // public List<String> getClassIdsByUserId(String userid) {
+    // List<Student> students = studentRepository.findByUserid(userid);
+    // return students.stream()
+    // .map(Student::getClassesid)
+    // .collect(Collectors.toList());
+    // }
 
     public Classes getClassDetails(String classId) {
         return classesRepository.findById(classId).orElse(null);
