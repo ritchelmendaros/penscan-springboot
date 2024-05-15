@@ -1,7 +1,7 @@
 package com.softeng.penscan.controller;
 
-import com.softeng.penscan.model.Classes;
-import com.softeng.penscan.service.ClassesService;
+import com.softeng.penscan.model.Class;
+import com.softeng.penscan.service.ClassService;
 
 import java.util.List;
 
@@ -12,18 +12,18 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/classes")
-public class ClassesController {
+public class ClassController {
 
     @Autowired
-    private ClassesService classesService;
+    private ClassService classesService;
 
     @PostMapping("/add")
-    public Classes addClass(@RequestBody Classes classes) {
+    public Class addClass(@RequestBody Class classes) {
         return classesService.addClass(classes);
     }
 
     @GetMapping("/getclassesbyteacherid")
-    public List<Classes> getClassesByTeacherId(@RequestParam("teacherid") String teacherid) {
+    public List<Class> getClassesByTeacherId(@RequestParam("teacherid") String teacherid) {
         return classesService.getClassesByTeacherId(teacherid);
     }
 
@@ -34,8 +34,8 @@ public class ClassesController {
     }
 
     @GetMapping("/getclassdetails")
-    public ResponseEntity<Classes> getClassDetails(@RequestParam("classid") String classid) {
-        Classes classes = classesService.getClassDetails(classid);
+    public ResponseEntity<Class> getClassDetails(@RequestParam("classid") String classid) {
+        Class classes = classesService.getClassDetails(classid);
         if (classes != null) {
             return ResponseEntity.ok(classes);
         } else {

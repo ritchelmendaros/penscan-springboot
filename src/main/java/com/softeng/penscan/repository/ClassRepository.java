@@ -1,6 +1,6 @@
 package com.softeng.penscan.repository;
 
-import com.softeng.penscan.model.Classes;
+import com.softeng.penscan.model.Class;
 
 import java.util.List;
 
@@ -8,11 +8,11 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ClassesRepository extends MongoRepository<Classes, String> {
+public interface ClassRepository extends MongoRepository<Class, String> {
 
-    Classes findByTeacherid(String teacherid);
+    Class findByTeacherid(String teacherid);
 
-    List<Classes> findAllByTeacherid(String teacherid);
+    List<Class> findAllByTeacherid(String teacherid);
 
     boolean existsByClassnameAndTeacherid(String classname, String teacherid);
 }

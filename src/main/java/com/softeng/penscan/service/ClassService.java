@@ -1,7 +1,7 @@
 package com.softeng.penscan.service;
 
-import com.softeng.penscan.model.Classes;
-import com.softeng.penscan.repository.ClassesRepository;
+import com.softeng.penscan.model.Class;
+import com.softeng.penscan.repository.ClassRepository;
 
 import java.util.List;
 
@@ -9,16 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ClassesService {
+public class ClassService {
 
     @Autowired
-    private ClassesRepository classesRepository;
+    private ClassRepository classesRepository;
 
-    public Classes addClass(Classes classes) {
+    public Class addClass(Class classes) {
         return classesRepository.save(classes);
     }
 
-    public List<Classes> getClassesByTeacherId(String teacherid) {
+    public List<Class> getClassesByTeacherId(String teacherid) {
         return classesRepository.findAllByTeacherid(teacherid);
     }
 
@@ -26,7 +26,7 @@ public class ClassesService {
         return classesRepository.existsByClassnameAndTeacherid(classname, teacherid);
     }
 
-    public Classes getClassDetails(String classid) {
+    public Class getClassDetails(String classid) {
         return classesRepository.findById(classid).orElse(null);
     }
 }

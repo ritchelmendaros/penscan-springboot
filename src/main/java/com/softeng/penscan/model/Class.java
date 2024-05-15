@@ -6,11 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Document(collection = "Classes")
+@Document(collection = "Class")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Classes {
+public class Class {
 
     @Id
     private String classid;

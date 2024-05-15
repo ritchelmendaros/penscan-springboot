@@ -1,6 +1,6 @@
 package com.softeng.penscan.controller;
 
-import com.softeng.penscan.model.Classes;
+import com.softeng.penscan.model.Class;
 import com.softeng.penscan.model.Student;
 import com.softeng.penscan.service.StudentService;
 
