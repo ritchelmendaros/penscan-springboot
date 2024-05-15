@@ -15,5 +15,6 @@ public class Student {
     @Id
     private String studentid;
     private String userid;
-    private String classesid;
+    private List<String> classes;
+    private List<String> quizId;
 }
