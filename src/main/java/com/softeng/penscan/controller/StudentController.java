@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softeng.penscan.model.Student;
 import com.softeng.penscan.service.StudentService;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,32 +45,19 @@ public class StudentController {
         }
     }
 
-    // @GetMapping("/getclassidbyuserid")
-    // public ResponseEntity<List<String>>
-    // getClassesByUserId(@RequestParam("studentid") String userid) {
-    // List<String> classIds = studentService.getClassIdsByUserId(userid);
-    // if (!classIds.isEmpty()) {
-    // return ResponseEntity.ok(classIds);
-    // } else {
-    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(classIds);
-    // }
-    // }
-
-    // @GetMapping("/getclassdetailsbyuserid")
-    // public ResponseEntity<List<Classes>>
-    // getClassDetailsByUserId(@RequestParam("studentid") String userid) {
-    // List<String> classIds = studentService.getClassIdsByUserId(userid);
-    // List<Classes> classDetails = new ArrayList<>();
-    // for (String classId : classIds) {
-    // Classes classDetail = studentService.getClassDetails(classId);
-    // if (classDetail != null) {
-    // classDetails.add(classDetail);
-    // }
-    // }
-    // if (!classDetails.isEmpty()) {
-    // return ResponseEntity.ok(classDetails);
-    // } else {
-    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(classDetails);
-    // }
-    // }
+    @GetMapping("/getclassidsbyuserid")
+    public ResponseEntity<List<String>> getClassIdsByUserId(@RequestParam("userid") String userid) {
+        try {
+            List<String> classIds = studentService.getClassIdsByUserId(userid);
+            if (!classIds.isEmpty()) {
+                return ResponseEntity.ok(classIds);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(classIds);
+            }
+        } catch (Exception e) {
+            String errorMessage = "Error getting class IDs for user with ID " + userid;
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonList(errorMessage));
+        }
+    }
 }
