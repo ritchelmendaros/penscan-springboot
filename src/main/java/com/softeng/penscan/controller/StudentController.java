@@ -21,6 +21,18 @@ public class StudentController {
         return new ResponseEntity<>(addedStudent, HttpStatus.CREATED);
     }
 
+    @PutMapping("/addclasstostudent")
+    public ResponseEntity<Student> addClassToStudent(
+            @RequestParam("studentid") String studentid,
+            @RequestParam("classid") String classid) {
+        Student updatedStudent = studentService.addClassToStudent(studentid, classid);
+        if (updatedStudent != null) {
+            return new ResponseEntity<>(updatedStudent, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     // @GetMapping("/getclassidbyuserid")
     // public ResponseEntity<List<String>>
     // getClassesByUserId(@RequestParam("studentid") String userid) {

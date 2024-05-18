@@ -4,6 +4,10 @@ import com.softeng.penscan.model.Class;
 import com.softeng.penscan.model.Student;
 import com.softeng.penscan.repository.ClassRepository;
 import com.softeng.penscan.repository.StudentRepository;
+
+import java.util.ArrayList;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +22,23 @@ public class StudentService {
 
     public Student addStudent(Student student) {
         return studentRepository.save(student);
+    }
+
+    public Student addClassToStudent(String studentid, String classid) {
+        Optional<Student> optionalStudent = studentRepository.findById(studentid);
+        if (optionalStudent.isPresent()) {
+            Student student = optionalStudent.get();
+            if (student.getClassid() == null) {
+                student.setClassid(new ArrayList<>());
+            }
+            if (!student.getClassid().contains(classid)) {
+                student.getClassid().add(classid);
+                return studentRepository.save(student);
+            }
+            return student;
+        } else {
+            return null;
+        }
     }
 
     // public List<String> getClassIdsByUserId(String userid) {

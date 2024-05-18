@@ -1,5 +1,6 @@
 package com.softeng.penscan.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,6 +17,6 @@ public class Student {
     @Id
     private String studentid;
     private String userid;
-    private List<String> classid;
-    private List<String> quizid;
+    private List<String> classid = new ArrayList<>();
+    private List<String> quizid = new ArrayList<>();
 }

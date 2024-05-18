@@ -28,19 +28,6 @@ public class UserService {
         this.studentRepository = studentRepository;
     }
 
-    // public boolean registerUser(User user) {
-    // if (userRepository.findByUsername(user.getUsername()) != null) {
-    // return false;
-    // }
-
-    // String hashedPassword = passwordEncoder.encode(user.getPassword());
-    // user.setPassword(hashedPassword);
-
-    // userRepository.save(user);
-
-    // return true;
-    // }
-
     public boolean registerUser(User user) {
         if (userRepository.findByUsername(user.getUsername()) != null) {
             return false;
