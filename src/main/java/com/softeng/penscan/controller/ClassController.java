@@ -34,12 +34,13 @@ public class ClassController {
     }
 
     @GetMapping("/getclassdetails")
-    public ResponseEntity<Class> getClassDetails(@RequestParam("classid") String classid) {
-        Class classes = classesService.getClassDetails(classid);
-        if (classes != null) {
+    public ResponseEntity<List<Class>> getClassDetails(@RequestParam("classids") List<String> classIds) {
+        List<Class> classes = classesService.getClassDetails(classIds);
+        if (!classes.isEmpty()) {
             return ResponseEntity.ok(classes);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
 }

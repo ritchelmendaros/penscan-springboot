@@ -26,7 +26,9 @@ public class ClassService {
         return classesRepository.existsByClassnameAndTeacherid(classname, teacherid);
     }
 
-    public Class getClassDetails(String classid) {
-        return classesRepository.findById(classid).orElse(null);
+    public List<Class> getClassDetails(List<String> classIds) {
+        List<Class> classes = classesRepository.findAllById(classIds);
+        return classes;
     }
+
 }
