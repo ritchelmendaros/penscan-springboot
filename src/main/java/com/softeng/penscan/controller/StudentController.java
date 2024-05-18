@@ -1,5 +1,6 @@
 package com.softeng.penscan.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softeng.penscan.model.Student;
 import com.softeng.penscan.service.StudentService;
 
@@ -22,14 +23,22 @@ public class StudentController {
     }
 
     @PutMapping("/addclasstostudent")
-    public ResponseEntity<Student> addClassToStudent(
-            @RequestParam("studentid") String studentid,
+    public ResponseEntity<Object> addClassToStudent(
+            @RequestParam("userid") String userid,
             @RequestParam("classid") String classid) {
-        Student updatedStudent = studentService.addClassToStudent(studentid, classid);
-        if (updatedStudent != null) {
-            return new ResponseEntity<>(updatedStudent, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Student updatedStudent = studentService.addClassToStudent(userid, classid);
+            if (updatedStudent != null) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                String updatedStudentJson = objectMapper.writeValueAsString(updatedStudent);
+                return ResponseEntity.ok(updatedStudentJson);
+            } else {
+                String errorMessage = "Student with ID " + userid + " not found.";
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+            }
+        } catch (Exception e) {
+            String errorMessage = "Error adding class to student.";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }
 

@@ -24,8 +24,8 @@ public class StudentService {
         return studentRepository.save(student);
     }
 
-    public Student addClassToStudent(String studentid, String classid) {
-        Optional<Student> optionalStudent = studentRepository.findById(studentid);
+    public Student addClassToStudent(String userid, String classid) {
+        Optional<Student> optionalStudent = studentRepository.findByUserid(userid);
         if (optionalStudent.isPresent()) {
             Student student = optionalStudent.get();
             if (student.getClassid() == null) {
@@ -37,7 +37,8 @@ public class StudentService {
             }
             return student;
         } else {
-            return null;
+            String errorMessage = "User with ID " + userid + " not found.";
+            throw new IllegalArgumentException(errorMessage);
         }
     }
 
@@ -51,4 +52,10 @@ public class StudentService {
     public Class getClassDetails(String classId) {
         return classesRepository.findById(classId).orElse(null);
     }
+
+    public String getStudentIdByUserId(String userid) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getStudentIdByUserId'");
+    }
+
 }
