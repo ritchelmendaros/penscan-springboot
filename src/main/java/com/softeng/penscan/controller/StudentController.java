@@ -3,6 +3,7 @@ package com.softeng.penscan.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softeng.penscan.model.Student;
 import com.softeng.penscan.service.StudentService;
+import com.softeng.penscan.utils.StudentClassResponse;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,10 +31,10 @@ public class StudentController {
             @RequestParam("userid") String userid,
             @RequestParam("classid") String classid) {
         try {
-            Student updatedStudent = studentService.addClassToStudentAndClass(userid, classid);
+            StudentClassResponse response = studentService.addClassToStudentAndClass(userid, classid);
             ObjectMapper objectMapper = new ObjectMapper();
-            String updatedStudentJson = objectMapper.writeValueAsString(updatedStudent);
-            return ResponseEntity.ok(updatedStudentJson);
+            String responseJson = objectMapper.writeValueAsString(response);
+            return ResponseEntity.ok(responseJson);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {

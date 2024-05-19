@@ -4,6 +4,7 @@ import com.softeng.penscan.model.Class;
 import com.softeng.penscan.model.Student;
 import com.softeng.penscan.repository.ClassRepository;
 import com.softeng.penscan.repository.StudentRepository;
+import com.softeng.penscan.utils.StudentClassResponse;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -27,7 +28,7 @@ public class StudentService {
         return studentRepository.save(student);
     }
 
-    public Student addClassToStudentAndClass(String userid, String classid) {
+    public StudentClassResponse addClassToStudentAndClass(String userid, String classid) {
         Optional<Student> optionalStudent = studentRepository.findByUserid(userid);
         if (!optionalStudent.isPresent()) {
             String errorMessage = "User with ID " + userid + " not found.";
@@ -60,7 +61,7 @@ public class StudentService {
         studentRepository.save(student);
         classRepository.save(classEntity);
 
-        return student;
+        return new StudentClassResponse(student, classEntity);
     }
 
     public Class getClassDetails(String classId) {
