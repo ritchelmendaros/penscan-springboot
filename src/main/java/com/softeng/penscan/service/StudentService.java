@@ -21,32 +21,50 @@ public class StudentService {
     private StudentRepository studentRepository;
 
     @Autowired
-    private ClassRepository classesRepository;
+    private ClassRepository classRepository;
 
     public Student addStudent(Student student) {
         return studentRepository.save(student);
     }
 
-    public Student addClassToStudent(String userid, String classid) {
+    public Student addClassToStudentAndClass(String userid, String classid) {
         Optional<Student> optionalStudent = studentRepository.findByUserid(userid);
-        if (optionalStudent.isPresent()) {
-            Student student = optionalStudent.get();
-            if (student.getClassid() == null) {
-                student.setClassid(new ArrayList<>());
-            }
-            if (!student.getClassid().contains(classid)) {
-                student.getClassid().add(classid);
-                return studentRepository.save(student);
-            }
-            return student;
-        } else {
+        if (!optionalStudent.isPresent()) {
             String errorMessage = "User with ID " + userid + " not found.";
             throw new IllegalArgumentException(errorMessage);
         }
+
+        Optional<Class> optionalClass = classRepository.findById(classid);
+        if (!optionalClass.isPresent()) {
+            String errorMessage = "Class with ID " + classid + " not found.";
+            throw new IllegalArgumentException(errorMessage);
+        }
+
+        Student student = optionalStudent.get();
+        Class classEntity = optionalClass.get();
+
+        if (student.getClassid() == null) {
+            student.setClassid(new ArrayList<>());
+        }
+        if (!student.getClassid().contains(classid)) {
+            student.getClassid().add(classid);
+        }
+
+        if (classEntity.getStudentid() == null) {
+            classEntity.setStudentid(new ArrayList<>());
+        }
+        if (!classEntity.getStudentid().contains(userid)) {
+            classEntity.getStudentid().add(userid);
+        }
+
+        studentRepository.save(student);
+        classRepository.save(classEntity);
+
+        return student;
     }
 
     public Class getClassDetails(String classId) {
-        return classesRepository.findById(classId).orElse(null);
+        return classRepository.findById(classId).orElse(null);
     }
 
     public List<String> getClassIdsByUserId(String userid) {

@@ -30,17 +30,14 @@ public class StudentController {
             @RequestParam("userid") String userid,
             @RequestParam("classid") String classid) {
         try {
-            Student updatedStudent = studentService.addClassToStudent(userid, classid);
-            if (updatedStudent != null) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                String updatedStudentJson = objectMapper.writeValueAsString(updatedStudent);
-                return ResponseEntity.ok(updatedStudentJson);
-            } else {
-                String errorMessage = "Student with ID " + userid + " not found.";
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
-            }
+            Student updatedStudent = studentService.addClassToStudentAndClass(userid, classid);
+            ObjectMapper objectMapper = new ObjectMapper();
+            String updatedStudentJson = objectMapper.writeValueAsString(updatedStudent);
+            return ResponseEntity.ok(updatedStudentJson);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            String errorMessage = "Error adding class to student.";
+            String errorMessage = "Error adding class to student: " + e.getMessage();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }

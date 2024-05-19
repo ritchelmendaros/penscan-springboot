@@ -12,23 +12,22 @@ import org.springframework.stereotype.Service;
 public class ClassService {
 
     @Autowired
-    private ClassRepository classesRepository;
+    private ClassRepository classRepository;
 
     public Class addClass(Class classes) {
-        return classesRepository.save(classes);
+        return classRepository.save(classes);
     }
 
     public List<Class> getClassesByTeacherId(String teacherid) {
-        return classesRepository.findAllByTeacherid(teacherid);
+        return classRepository.findAllByTeacherid(teacherid);
     }
 
     public boolean checkClass(String classname, String teacherid) {
-        return classesRepository.existsByClassnameAndTeacherid(classname, teacherid);
+        return classRepository.existsByClassnameAndTeacherid(classname, teacherid);
     }
 
-    public List<Class> getClassDetails(List<String> classIds) {
-        List<Class> classes = classesRepository.findAllById(classIds);
-        return classes;
+    public List<Class> getClassDetails(List<String> classids) {
+        return classRepository.findAllById(classids);
     }
 
 }
