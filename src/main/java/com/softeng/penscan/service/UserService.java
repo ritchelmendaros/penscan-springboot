@@ -81,4 +81,16 @@ public class UserService {
     public Object getUserDetailsByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+
+    public boolean updateUserDetails(String username, String firstName, String lastName) {
+        Object userObj = userRepository.findByUsername(username);
+        if (userObj != null && userObj instanceof User) {
+            User user = (User) userObj;
+            user.setFirstname(firstName);
+            user.setLastname(lastName);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
 }
