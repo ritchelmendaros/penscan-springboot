@@ -20,4 +20,9 @@ public class StudentQuiz {
     private int score;
     private Binary quizimage;
     private String recognizedtext;
+    private String base64Image;
+
+    public void setBase64Image(String base64Image) {
+        this.base64Image = base64Image;
+    }
 }

@@ -1,10 +1,14 @@
 package com.softeng.penscan.controller;
 
+import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.Base64;
+
+import com.softeng.penscan.model.StudentQuiz;
 import com.softeng.penscan.service.StudentQuizService;
 
 import java.io.IOException;
@@ -27,6 +31,22 @@ public class StudentQuizController {
         } catch (IOException | InterruptedException e) {
             return new ResponseEntity<>("Error saving student quiz: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get")
+    public ResponseEntity<StudentQuiz> getStudentQuiz(@RequestParam("id") String id) {
+        StudentQuiz studentQuiz = studentQuizService.getStudentQuiz(id);
+        if (studentQuiz != null) {
+            Binary imageData = studentQuiz.getQuizimage();
+            if (imageData != null) {
+                byte[] imageBytes = imageData.getData();
+                String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+                studentQuiz.setBase64Image(base64Image);
+            }
+            return new ResponseEntity<>(studentQuiz, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }
