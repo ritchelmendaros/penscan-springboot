@@ -72,4 +72,14 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
         }
     }
+
+    @GetMapping("/getuserdetails")
+    public ResponseEntity<Object> getUserDetails(@RequestParam("username") String username) {
+        Object user = userService.getUserDetailsByUsername(username);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
 }

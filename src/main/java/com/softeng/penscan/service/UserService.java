@@ -77,4 +77,8 @@ public class UserService {
     public List<User> getUsersByType(String userType) {
         return userRepository.findByUserType(userType);
     }
+
+    public Object getUserDetailsByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
 }
