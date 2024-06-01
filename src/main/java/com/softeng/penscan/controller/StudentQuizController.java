@@ -24,8 +24,9 @@ public class StudentQuizController {
         try {
             String studentQuizId = studentQuizService.addStudentQuiz(quizid, studentid, score, image);
             return new ResponseEntity<>("Student quiz saved successfully with ID: " + studentQuizId, HttpStatus.OK);
-        } catch (IOException e) {
-            return new ResponseEntity<>("Error saving student quiz", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IOException | InterruptedException e) {
+            return new ResponseEntity<>("Error saving student quiz: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

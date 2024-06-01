@@ -16,12 +16,20 @@ public class StudentQuizService {
     @Autowired
     private StudentQuizRepository studentQuizRepository;
 
-    public String addStudentQuiz(String quizid, String studentid, int score, MultipartFile image) throws IOException {
+    @Autowired
+    private AzureTextRecognitionService azureTextRecognitionService;
+
+    public String addStudentQuiz(String quizid, String studentid, int score, MultipartFile image)
+            throws IOException, InterruptedException {
         StudentQuiz studentQuiz = new StudentQuiz();
         studentQuiz.setQuizid(quizid);
         studentQuiz.setStudentid(studentid);
         studentQuiz.setScore(score);
         studentQuiz.setQuizimage(new Binary(BsonBinarySubType.BINARY, image.getBytes())); // Set image as binary
+
+        // Recognize text from the image
+        String recognizedText = azureTextRecognitionService.recognizeText(image);
+        studentQuiz.setRecognizedtext(recognizedText);
 
         studentQuiz = studentQuizRepository.insert(studentQuiz); // Save the studentQuiz object to the database
         return studentQuiz.getStudentquizid();
