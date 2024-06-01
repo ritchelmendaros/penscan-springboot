@@ -3,14 +3,19 @@ package com.softeng.penscan.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softeng.penscan.model.Student;
 import com.softeng.penscan.service.StudentService;
+import com.softeng.penscan.service.UserService;
 import com.softeng.penscan.utils.StudentClassResponse;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import com.softeng.penscan.model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +24,8 @@ public class StudentController {
 
     @Autowired
     private StudentService studentService;
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/addstudent")
     public ResponseEntity<Student> addStudent(@RequestBody Student student) {
@@ -58,4 +65,26 @@ public class StudentController {
                     .body(Collections.singletonList(errorMessage));
         }
     }
+
+    @GetMapping("/getstudentsbyclassid")
+    public ResponseEntity<?> getStudentsByClassId(@RequestParam("classid") String classId) {
+        try {
+            List<Student> students = studentService.getStudentsByClassId(classId);
+            if (!students.isEmpty()) {
+                List<User> userList = new ArrayList<>();
+                for (Student student : students) {
+                    User user = userService.getUserDetailsByUserId(student.getUserid());
+                    userList.add(user);
+                }
+                return ResponseEntity.ok(userList);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No students found for class with ID " + classId);
+            }
+        } catch (Exception e) {
+            String errorMessage = "Error getting students for class with ID " + classId;
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+
 }

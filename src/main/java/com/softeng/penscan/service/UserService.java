@@ -10,6 +10,7 @@ import com.softeng.penscan.repository.UserRepository;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Service
@@ -92,5 +93,9 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public User getUserDetailsByUserId(String userId) {
+        return userRepository.findByUserid(userId);
     }
 }

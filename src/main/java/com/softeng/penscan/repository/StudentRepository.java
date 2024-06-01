@@ -2,6 +2,7 @@ package com.softeng.penscan.repository;
 
 import com.softeng.penscan.model.Student;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -15,5 +16,7 @@ public interface StudentRepository extends MongoRepository<Student, String> {
     String getStudentidByUserid(String userid);
 
     String findStudentidByUserid(String userid);
+
+    List<Student> findByClassid(String classId);
 
 }

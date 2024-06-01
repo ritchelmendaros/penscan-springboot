@@ -77,4 +77,8 @@ public class StudentService {
             throw new EntityNotFoundException("Student not found with userid: " + userid);
         }
     }
+
+    public List<Student> getStudentsByClassId(String classId) {
+        return studentRepository.findByClassid(classId);
+    }
 }
