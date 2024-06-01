@@ -16,5 +16,6 @@ public class Quiz {
     private String quizid;
     private String classid;
     private String quizname;
+    private String teacherid;
     private String quizanswerkey;
 }
