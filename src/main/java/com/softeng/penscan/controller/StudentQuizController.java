@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.softeng.penscan.model.StudentQuiz;
 import com.softeng.penscan.service.StudentQuizService;
@@ -33,8 +35,8 @@ public class StudentQuizController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<StudentQuiz> getStudentQuiz(@RequestParam("id") String id) {
-        StudentQuiz studentQuiz = studentQuizService.getStudentQuiz(id);
+    public ResponseEntity<Object> getStudentQuizByStudentId(@RequestParam("studentid") String studentId) {
+        StudentQuiz studentQuiz = studentQuizService.getStudentQuizByStudentId(studentId);
         if (studentQuiz != null) {
             Binary imageData = studentQuiz.getQuizimage();
             if (imageData != null) {
@@ -44,7 +46,10 @@ public class StudentQuizController {
             }
             return new ResponseEntity<>(studentQuiz, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "No data found for the student ID");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }
+
 }

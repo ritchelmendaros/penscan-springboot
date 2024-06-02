@@ -104,4 +104,8 @@ public class StudentQuizService {
     public StudentQuiz getStudentQuiz(String id) {
         return studentQuizRepository.findById(id).orElse(null);
     }
+
+    public StudentQuiz getStudentQuizByStudentId(String studentId) {
+        return studentQuizRepository.findByStudentid(studentId).orElse(null);
+    }
 }
