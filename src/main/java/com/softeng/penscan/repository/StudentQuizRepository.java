@@ -8,4 +8,6 @@ import com.softeng.penscan.model.StudentQuiz;
 public interface StudentQuizRepository extends MongoRepository<StudentQuiz, String> {
 
     Optional<StudentQuiz> findByStudentid(String studentId);
+
+    Optional<StudentQuiz> findByStudentidAndQuizid(String studentId, String quizId);
 }

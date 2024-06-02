@@ -21,4 +21,8 @@ public class QuizService {
     public List<Quiz> getQuizzesByTeacherIdAndClassId(String teacherId, String classId) {
         return quizRepository.findByTeacheridAndClassid(teacherId, classId);
     }
+
+    public Quiz getQuizById(String quizId) {
+        return quizRepository.findById(quizId).orElse(null);
+    }
 }

@@ -28,4 +28,15 @@ public class QuizController {
             @RequestParam("classid") String classId) {
         return quizService.getQuizzesByTeacherIdAndClassId(teacherId, classId);
     }
+
+    @GetMapping("/getanswerkey")
+    public String getAnswerKeyByQuizId(@RequestParam("quizid") String quizId) {
+        Quiz quiz = quizService.getQuizById(quizId);
+        if (quiz != null) {
+            return quiz.getQuizanswerkey();
+        } else {
+            return "Quiz not found";
+        }
+    }
+
 }

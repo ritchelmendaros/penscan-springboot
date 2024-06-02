@@ -35,8 +35,11 @@ public class StudentQuizController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<Object> getStudentQuizByStudentId(@RequestParam("studentid") String studentId) {
-        StudentQuiz studentQuiz = studentQuizService.getStudentQuizByStudentId(studentId);
+    public ResponseEntity<Object> getStudentQuizByStudentIdAndQuizId(
+            @RequestParam("studentid") String studentId,
+            @RequestParam("quizid") String quizId) {
+
+        StudentQuiz studentQuiz = studentQuizService.getStudentQuizByStudentIdAndQuizId(studentId, quizId);
         if (studentQuiz != null) {
             Binary imageData = studentQuiz.getQuizimage();
             if (imageData != null) {
@@ -47,7 +50,7 @@ public class StudentQuizController {
             return new ResponseEntity<>(studentQuiz, HttpStatus.OK);
         } else {
             Map<String, String> response = new HashMap<>();
-            response.put("message", "No data found for the student ID");
+            response.put("message", "No data found for the student ID and quiz ID");
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }

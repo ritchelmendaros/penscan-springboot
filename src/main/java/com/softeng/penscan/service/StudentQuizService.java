@@ -47,7 +47,8 @@ public class StudentQuizService {
 
         String recognizedText = azureTextRecognitionService.recognizeText(image);
 
-        String[] recognizedLines = recognizedText.split("\\n");
+        String normalizedText = normalizeRecognizedText(recognizedText);
+        String[] recognizedLines = normalizedText.split("\\n");
 
         String name = recognizedLines.length > 0 ? recognizedLines[0].trim() : "";
         String[] nameParts = name.split("\\s+");
@@ -63,7 +64,7 @@ public class StudentQuizService {
         }
         User user = userOptional.get();
         studentQuiz.setStudentid(user.getUserid());
-        studentQuiz.setRecognizedtext(recognizedText);
+        studentQuiz.setRecognizedtext(normalizedText);
 
         Optional<Quiz> quizOptional = quizRepository.findById(quizid);
         if (!quizOptional.isPresent()) {
@@ -75,6 +76,7 @@ public class StudentQuizService {
         String[] answerKeyLines = answerKey.split("\\n");
         int matchingAnswersCount = 0;
         Pattern pattern = Pattern.compile("^(\\d+)\\.\\s(.*)$");
+
         for (String recognizedLine : recognizedLines) {
             Matcher matcher = pattern.matcher(recognizedLine.trim());
             if (matcher.find()) {
@@ -91,6 +93,7 @@ public class StudentQuizService {
                 }
             }
         }
+
         int score = matchingAnswersCount;
         studentQuiz.setScore(score);
 
@@ -109,11 +112,41 @@ public class StudentQuizService {
         return studentQuiz.getStudentquizid();
     }
 
+    private String normalizeRecognizedText(String text) {
+        // Step 1: Insert newlines before question numbers
+        String normalizedText = text.replaceAll("(\\d+\\.\\s*)", "\n$1");
+
+        // Step 2: Ensure only one space after the number and dot
+        normalizedText = normalizedText.replaceAll("\\s*\\.\\s*", ". ").replaceAll("\\s+", " ");
+
+        // Step 3: Trim leading and trailing whitespace
+        normalizedText = normalizedText.trim();
+
+        // Step 4: Remove multiple newlines
+        normalizedText = normalizedText.replaceAll("\\n{2,}", "\n");
+
+        // Step 5: Ensure the name is on the first line
+        if (normalizedText.startsWith("\n")) {
+            normalizedText = normalizedText.substring(1);
+        }
+        Pattern pattern = Pattern.compile("(\\d+\\.\\s[A-Z])");
+        Matcher matcher = pattern.matcher(normalizedText);
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            matcher.appendReplacement(sb, "\n" + matcher.group(1));
+        }
+        matcher.appendTail(sb);
+        normalizedText = sb.toString().trim();
+
+        return normalizedText;
+    }
+
     public StudentQuiz getStudentQuiz(String id) {
         return studentQuizRepository.findById(id).orElse(null);
     }
 
-    public StudentQuiz getStudentQuizByStudentId(String studentId) {
-        return studentQuizRepository.findByStudentid(studentId).orElse(null);
+    public StudentQuiz getStudentQuizByStudentIdAndQuizId(String studentId, String quizId) {
+        return studentQuizRepository.findByStudentidAndQuizid(studentId, quizId).orElse(null);
     }
+
 }
