@@ -16,5 +16,6 @@ public class ItemAnalysis {
     private String itemanalysisid;
     private String quizid;
     private String itemanalysisname;
-    private String itemanalysis;
+    private int correctCount;
+    private int incorrectCount;
 }
