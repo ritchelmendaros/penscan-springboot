@@ -1,14 +1,17 @@
 package com.softeng.penscan.service;
 
 import com.softeng.penscan.model.Class;
+import com.softeng.penscan.model.Quiz;
 import com.softeng.penscan.model.Student;
 import com.softeng.penscan.repository.ClassRepository;
+import com.softeng.penscan.repository.QuizRepository;
 import com.softeng.penscan.repository.StudentRepository;
 import com.softeng.penscan.utils.StudentClassResponse;
 
 import jakarta.persistence.EntityNotFoundException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +26,9 @@ public class StudentService {
 
     @Autowired
     private ClassRepository classRepository;
+
+    @Autowired
+    private QuizRepository quizRepository;
 
     public Student addStudent(Student student) {
         return studentRepository.save(student);
@@ -81,4 +87,21 @@ public class StudentService {
     public List<Student> getStudentsByClassId(String classId) {
         return studentRepository.findByClassid(classId);
     }
+
+    public List<String> getQuizIdsByUserIdAndClassId(String userId, String classId) {
+        Optional<Student> studentOptional = studentRepository.findByUserid(userId);
+        if (studentOptional.isPresent()) {
+            Student student = studentOptional.get();
+            if (student.getClassid().contains(classId)) {
+                return student.getQuizid();
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    public String getQuizNameById(String quizId) {
+        Optional<Quiz> quizOptional = quizRepository.findById(quizId);
+        return quizOptional.map(Quiz::getQuizname).orElse(null);
+    }
+
 }

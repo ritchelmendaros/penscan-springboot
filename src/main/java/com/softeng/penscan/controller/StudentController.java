@@ -2,6 +2,7 @@ package com.softeng.penscan.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softeng.penscan.model.Student;
+import com.softeng.penscan.utils.QuizDTO;
 import com.softeng.penscan.service.StudentService;
 import com.softeng.penscan.service.UserService;
 import com.softeng.penscan.utils.StudentClassResponse;
@@ -84,6 +85,34 @@ public class StudentController {
             String errorMessage = "Error getting students for class with ID " + classId;
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
+    }
+
+    @GetMapping("/getquizidsandnamesbyuseridandclassid")
+    public ResponseEntity<List<QuizDTO>> getQuizIdsAndNamesByUserIdAndClassId(
+            @RequestParam("userid") String userId,
+            @RequestParam("classid") String classId) {
+        try {
+            List<String> quizIds = studentService.getQuizIdsByUserIdAndClassId(userId, classId);
+            List<QuizDTO> quizDetails = new ArrayList<>();
+            for (String quizId : quizIds) {
+                String quizName = studentService.getQuizNameById(quizId);
+                quizDetails.add(new QuizDTO(quizId, quizName));
+            }
+            if (!quizDetails.isEmpty()) {
+                return ResponseEntity.ok(quizDetails);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+            }
+        } catch (Exception e) {
+            String errorMessage = "Error getting quiz IDs and names for user with ID " + userId + " and class ID "
+                    + classId;
+            QuizDTO errorDTO = new QuizDTO(null, null); // Or set appropriate default values
+            List<QuizDTO> errorList = new ArrayList<>();
+            errorList.add(errorDTO);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(errorList);
+        }
+
     }
 
 }

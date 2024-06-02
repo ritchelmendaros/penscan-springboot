@@ -84,13 +84,10 @@ public class StudentQuizService {
         int matchingAnswersCount = 0;
         Pattern pattern = Pattern.compile("^(\\d+)\\.\\s(.*)$");
 
-        // Fetch existing item analyses for the quiz
         List<ItemAnalysis> existingItemAnalyses = itemAnalysisRepository.findByQuizid(quizid);
 
-        // Item analysis map to track correct and incorrect counts per item number
         Map<Integer, ItemAnalysis> itemAnalysisMap = new HashMap<>();
 
-        // Populate the map with existing item analyses (if any)
         for (ItemAnalysis existingItemAnalysis : existingItemAnalyses) {
             itemAnalysisMap.put(existingItemAnalysis.getItemNumber(), existingItemAnalysis);
         }
