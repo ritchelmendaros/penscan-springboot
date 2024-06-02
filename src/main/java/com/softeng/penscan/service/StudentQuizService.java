@@ -16,7 +16,9 @@ import com.softeng.penscan.repository.StudentRepository;
 import com.softeng.penscan.repository.UserRepository;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -147,6 +149,17 @@ public class StudentQuizService {
 
     public StudentQuiz getStudentQuizByStudentIdAndQuizId(String studentId, String quizId) {
         return studentQuizRepository.findByStudentidAndQuizid(studentId, quizId).orElse(null);
+    }
+
+    public Map<String, Integer> getScoresAndStudentIdsByQuizId(String quizId) {
+        List<StudentQuiz> studentQuizzes = studentQuizRepository.findByQuizid(quizId);
+        Map<String, Integer> scoresAndStudentIds = new HashMap<>();
+
+        for (StudentQuiz studentQuiz : studentQuizzes) {
+            scoresAndStudentIds.put(studentQuiz.getStudentid(), studentQuiz.getScore());
+        }
+
+        return scoresAndStudentIds;
     }
 
 }

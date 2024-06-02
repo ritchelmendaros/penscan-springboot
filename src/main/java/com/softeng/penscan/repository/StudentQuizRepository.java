@@ -1,5 +1,6 @@
 package com.softeng.penscan.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -10,4 +11,6 @@ public interface StudentQuizRepository extends MongoRepository<StudentQuiz, Stri
     Optional<StudentQuiz> findByStudentid(String studentId);
 
     Optional<StudentQuiz> findByStudentidAndQuizid(String studentId, String quizId);
+
+    List<StudentQuiz> findByQuizid(String quizId);
 }
