@@ -89,14 +89,31 @@ public class StudentService {
     }
 
     public List<String> getQuizIdsByUserIdAndClassId(String userId, String classId) {
+        // Get the student with the specified user ID
         Optional<Student> studentOptional = studentRepository.findByUserid(userId);
         if (studentOptional.isPresent()) {
             Student student = studentOptional.get();
-            if (student.getClassid().contains(classId)) {
-                return student.getQuizid();
+            // Retrieve the quiz IDs associated with the user
+            List<String> quizIds = student.getQuizid();
+            List<String> matchingQuizIds = new ArrayList<>();
+            // Iterate through each quiz ID
+            for (String quizId : quizIds) {
+                // Get the quiz details using the quiz ID
+                Optional<Quiz> quizOptional = quizRepository.findById(quizId);
+                if (quizOptional.isPresent()) {
+                    Quiz quiz = quizOptional.get();
+                    // Check if the quiz's class ID matches the specified class ID
+                    if (quiz.getClassid().equals(classId)) {
+                        // If it matches, add the quiz ID to the list of matching quiz IDs
+                        matchingQuizIds.add(quizId);
+                    }
+                }
             }
+            return matchingQuizIds;
+        } else {
+            // If the user with the specified ID is not found, return an empty list
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
     }
 
     public String getQuizNameById(String quizId) {
