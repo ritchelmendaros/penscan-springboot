@@ -23,10 +23,9 @@ public class StudentQuizController {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadStudentQuiz(@RequestParam("quizid") String quizid,
             @RequestParam("studentid") String studentid,
-            @RequestParam("score") int score,
             @RequestParam("image") MultipartFile image) {
         try {
-            String studentQuizId = studentQuizService.addStudentQuiz(quizid, studentid, score, image);
+            String studentQuizId = studentQuizService.addStudentQuiz(quizid, studentid, image);
             return new ResponseEntity<>("Student quiz saved successfully with ID: " + studentQuizId, HttpStatus.OK);
         } catch (IOException | InterruptedException e) {
             return new ResponseEntity<>("Error saving student quiz: " + e.getMessage(),

@@ -19,19 +19,17 @@ public class StudentQuizService {
     @Autowired
     private AzureTextRecognitionService azureTextRecognitionService;
 
-    public String addStudentQuiz(String quizid, String studentid, int score, MultipartFile image)
+    public String addStudentQuiz(String quizid, String studentid, MultipartFile image)
             throws IOException, InterruptedException {
         StudentQuiz studentQuiz = new StudentQuiz();
         studentQuiz.setQuizid(quizid);
         studentQuiz.setStudentid(studentid);
-        studentQuiz.setScore(score);
-        studentQuiz.setQuizimage(new Binary(BsonBinarySubType.BINARY, image.getBytes())); // Set image as binary
+        studentQuiz.setQuizimage(new Binary(BsonBinarySubType.BINARY, image.getBytes()));
 
-        // Recognize text from the image
         String recognizedText = azureTextRecognitionService.recognizeText(image);
         studentQuiz.setRecognizedtext(recognizedText);
 
-        studentQuiz = studentQuizRepository.insert(studentQuiz); // Save the studentQuiz object to the database
+        studentQuiz = studentQuizRepository.insert(studentQuiz);
         return studentQuiz.getStudentquizid();
     }
 
