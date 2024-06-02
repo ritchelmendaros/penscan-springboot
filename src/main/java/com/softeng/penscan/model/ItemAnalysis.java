@@ -15,7 +15,11 @@ public class ItemAnalysis {
     @Id
     private String itemanalysisid;
     private String quizid;
-    private String itemanalysisname;
+    private int itemNumber;
     private int correctCount;
     private int incorrectCount;
+
+    public void setItemNumber(int itemNumber) {
+        this.itemNumber = itemNumber;
+    }
 }

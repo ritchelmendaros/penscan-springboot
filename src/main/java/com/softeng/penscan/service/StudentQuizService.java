@@ -6,10 +6,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 
+import com.softeng.penscan.model.ItemAnalysis;
 import com.softeng.penscan.model.Quiz;
 import com.softeng.penscan.model.Student;
 import com.softeng.penscan.model.StudentQuiz;
 import com.softeng.penscan.model.User;
+import com.softeng.penscan.repository.ItemAnalysisRepository;
 import com.softeng.penscan.repository.QuizRepository;
 import com.softeng.penscan.repository.StudentQuizRepository;
 import com.softeng.penscan.repository.StudentRepository;
@@ -40,6 +42,9 @@ public class StudentQuizService {
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private ItemAnalysisRepository itemAnalysisRepository;
 
     public String addStudentQuiz(String quizid, MultipartFile image) throws IOException, InterruptedException {
 
@@ -79,6 +84,17 @@ public class StudentQuizService {
         int matchingAnswersCount = 0;
         Pattern pattern = Pattern.compile("^(\\d+)\\.\\s(.*)$");
 
+        // Fetch existing item analyses for the quiz
+        List<ItemAnalysis> existingItemAnalyses = itemAnalysisRepository.findByQuizid(quizid);
+
+        // Item analysis map to track correct and incorrect counts per item number
+        Map<Integer, ItemAnalysis> itemAnalysisMap = new HashMap<>();
+
+        // Populate the map with existing item analyses (if any)
+        for (ItemAnalysis existingItemAnalysis : existingItemAnalyses) {
+            itemAnalysisMap.put(existingItemAnalysis.getItemNumber(), existingItemAnalysis);
+        }
+
         for (String recognizedLine : recognizedLines) {
             Matcher matcher = pattern.matcher(recognizedLine.trim());
             if (matcher.find()) {
@@ -88,18 +104,59 @@ public class StudentQuizService {
                     Matcher answerMatcher = pattern.matcher(answerKeyLines[lineNumber - 1].trim());
                     if (answerMatcher.find()) {
                         String answerKeyAnswer = answerMatcher.group(2).trim();
-                        if (recognizedAnswer.equalsIgnoreCase(answerKeyAnswer)) {
+                        boolean isCorrect = recognizedAnswer.equalsIgnoreCase(answerKeyAnswer);
+                        if (isCorrect) {
                             matchingAnswersCount++;
+                        }
+
+                        // Check if an item analysis already exists for the current quizid and
+                        // itemNumber
+                        Optional<ItemAnalysis> existingItemAnalysis = existingItemAnalyses.stream()
+                                .filter(item -> item.getItemNumber() == lineNumber)
+                                .findFirst();
+
+                        if (existingItemAnalysis.isPresent()) {
+                            // Update existing item analysis
+                            ItemAnalysis itemAnalysis = existingItemAnalysis.get();
+                            if (isCorrect) {
+                                itemAnalysis.setCorrectCount(itemAnalysis.getCorrectCount() + 1);
+                            } else {
+                                itemAnalysis.setIncorrectCount(itemAnalysis.getIncorrectCount() + 1);
+                            }
+                            itemAnalysisMap.put(lineNumber, itemAnalysis);
+                        } else {
+                            // Create a new item analysis
+                            ItemAnalysis newItemAnalysis = new ItemAnalysis();
+                            newItemAnalysis.setQuizid(quizid);
+                            newItemAnalysis.setItemNumber(lineNumber);
+                            if (isCorrect) {
+                                newItemAnalysis.setCorrectCount(1);
+                                newItemAnalysis.setIncorrectCount(0);
+                            } else {
+                                newItemAnalysis.setCorrectCount(0);
+                                newItemAnalysis.setIncorrectCount(1);
+                            }
+                            itemAnalysisMap.put(lineNumber, newItemAnalysis);
                         }
                     }
                 }
             }
         }
 
+        // Save or update item analyses in the database
+        for (ItemAnalysis itemAnalysis : itemAnalysisMap.values()) {
+            itemAnalysisRepository.save(itemAnalysis);
+        }
+
         int score = matchingAnswersCount;
         studentQuiz.setScore(score);
 
         studentQuiz = studentQuizRepository.insert(studentQuiz);
+
+        // Save item analysis to the database
+        for (ItemAnalysis itemAnalysis : itemAnalysisMap.values()) {
+            itemAnalysisRepository.save(itemAnalysis);
+        }
 
         Optional<Student> studentOptional = studentRepository.findByUserid(user.getUserid());
         if (!studentOptional.isPresent()) {
