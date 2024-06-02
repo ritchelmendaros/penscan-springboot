@@ -8,8 +8,10 @@ import org.bson.types.Binary;
 
 import com.softeng.penscan.model.Quiz;
 import com.softeng.penscan.model.StudentQuiz;
+import com.softeng.penscan.model.User;
 import com.softeng.penscan.repository.QuizRepository;
 import com.softeng.penscan.repository.StudentQuizRepository;
+import com.softeng.penscan.repository.UserRepository;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -28,32 +30,49 @@ public class StudentQuizService {
     @Autowired
     private QuizRepository quizRepository;
 
-    public String addStudentQuiz(String quizid, String studentid, MultipartFile image)
+    @Autowired
+    private UserRepository userRepository;
+
+    public String addStudentQuiz(String quizid, MultipartFile image)
             throws IOException, InterruptedException {
         StudentQuiz studentQuiz = new StudentQuiz();
         studentQuiz.setQuizid(quizid);
-        studentQuiz.setStudentid(studentid);
         studentQuiz.setQuizimage(new Binary(BsonBinarySubType.BINARY, image.getBytes()));
 
         String recognizedText = azureTextRecognitionService.recognizeText(image);
 
-        // Split the recognized text by lines
         String[] recognizedLines = recognizedText.split("\\n");
+
+        String name = "";
+        if (recognizedLines.length > 0) {
+            name = recognizedLines[0].trim();
+        }
+
+        String[] nameParts = name.split("\\s+");
+        if (nameParts.length < 2) {
+            throw new IllegalArgumentException("Invalid name format in recognized text: " + name);
+        }
+        String firstname = nameParts[0];
+        String lastname = nameParts[1];
+
+        Optional<User> userOptional = userRepository.findByFirstnameAndLastname(firstname, lastname);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            studentQuiz.setStudentid(user.getUserid());
+        } else {
+            throw new IllegalArgumentException("User not found with name: " + name);
+        }
 
         studentQuiz.setRecognizedtext(recognizedText);
 
-        // Fetch the quiz by quizid
         Optional<Quiz> quizOptional = quizRepository.findById(quizid);
         if (quizOptional.isPresent()) {
             Quiz quiz = quizOptional.get();
             String answerKey = quiz.getQuizanswerkey();
-            // Split the answer key by lines
             String[] answerKeyLines = answerKey.split("\\n");
 
-            // Initialize matching answers count
             int matchingAnswersCount = 0;
 
-            // Compare recognized lines with answer key lines
             Pattern pattern = Pattern.compile("^(\\d+)\\.\\s(.*)$");
             for (String recognizedLine : recognizedLines) {
                 Matcher matcher = pattern.matcher(recognizedLine.trim());
@@ -61,11 +80,9 @@ public class StudentQuizService {
                     int lineNumber = Integer.parseInt(matcher.group(1));
                     String recognizedAnswer = matcher.group(2).trim();
                     if (lineNumber > 0 && lineNumber <= answerKeyLines.length) {
-                        // Extract the answer from the answer key
                         Matcher answerMatcher = pattern.matcher(answerKeyLines[lineNumber - 1].trim());
                         if (answerMatcher.find()) {
                             String answerKeyAnswer = answerMatcher.group(2).trim();
-                            // Check if the recognized line matches the answer key line
                             if (recognizedAnswer.equalsIgnoreCase(answerKeyAnswer)) {
                                 matchingAnswersCount++;
                             }
@@ -73,13 +90,10 @@ public class StudentQuizService {
                     }
                 }
             }
-
-            // Calculate the score based on matching answers
             int score = matchingAnswersCount;
             studentQuiz.setScore(score);
 
         } else {
-            // Handle case where quiz with given quizid is not found
             throw new IllegalArgumentException("Quiz not found with quizid: " + quizid);
         }
 
