@@ -156,11 +156,6 @@ public class StudentQuizService {
 
         studentQuiz = studentQuizRepository.insert(studentQuiz);
 
-        // Save item analysis to the database
-        for (ItemAnalysis itemAnalysis : itemAnalysisMap.values()) {
-            itemAnalysisRepository.save(itemAnalysis);
-        }
-
         Optional<Student> studentOptional = studentRepository.findByUserid(user.getUserid());
         if (!studentOptional.isPresent()) {
             throw new IllegalArgumentException("Student not found with userid: " + user.getUserid());
@@ -221,4 +216,93 @@ public class StudentQuizService {
 
         return scoresAndStudentIds;
     }
+
+    public void editStudentQuiz(String studentQuizId, String newText) throws IOException {
+        Optional<StudentQuiz> studentQuizOptional = studentQuizRepository.findById(studentQuizId);
+        if (!studentQuizOptional.isPresent()) {
+            throw new IllegalArgumentException("Student quiz not found with ID: " + studentQuizId);
+        }
+
+        StudentQuiz studentQuiz = studentQuizOptional.get();
+        String quizId = studentQuiz.getQuizid();
+
+        // Set the recognized text directly without normalization
+        studentQuiz.setRecognizedtext(newText);
+
+        // Get the quiz and answer key
+        Optional<Quiz> quizOptional = quizRepository.findById(quizId);
+        if (!quizOptional.isPresent()) {
+            throw new IllegalArgumentException("Quiz not found with quizid: " + quizId);
+        }
+        Quiz quiz = quizOptional.get();
+        String answerKey = quiz.getQuizanswerkey();
+        String[] answerKeyLines = answerKey.split("\\n");
+
+        // Update the score and item analysis
+        int matchingAnswersCount = 0;
+        Pattern pattern = Pattern.compile("^(\\d+)\\.\\s(.*)$");
+        List<ItemAnalysis> existingItemAnalyses = itemAnalysisRepository.findByQuizid(quizId);
+
+        Map<Integer, ItemAnalysis> itemAnalysisMap = new HashMap<>();
+        for (ItemAnalysis existingItemAnalysis : existingItemAnalyses) {
+            itemAnalysisMap.put(existingItemAnalysis.getItemNumber(), existingItemAnalysis);
+        }
+
+        String[] recognizedLines = newText.split("\\n");
+        for (String recognizedLine : recognizedLines) {
+            Matcher matcher = pattern.matcher(recognizedLine.trim());
+            if (matcher.find()) {
+                int lineNumber = Integer.parseInt(matcher.group(1));
+                String recognizedAnswer = matcher.group(2).trim();
+                if (lineNumber > 0 && lineNumber <= answerKeyLines.length) {
+                    Matcher answerMatcher = pattern.matcher(answerKeyLines[lineNumber - 1].trim());
+                    if (answerMatcher.find()) {
+                        String answerKeyAnswer = answerMatcher.group(2).trim();
+                        boolean isCorrect = recognizedAnswer.equalsIgnoreCase(answerKeyAnswer);
+                        if (isCorrect) {
+                            matchingAnswersCount++;
+                        }
+
+                        // Update item analysis
+                        Optional<ItemAnalysis> existingItemAnalysis = existingItemAnalyses.stream()
+                                .filter(item -> item.getItemNumber() == lineNumber)
+                                .findFirst();
+
+                        if (existingItemAnalysis.isPresent()) {
+                            // Update existing item analysis
+                            ItemAnalysis itemAnalysis = existingItemAnalysis.get();
+                            if (isCorrect) {
+                                itemAnalysis.setCorrectCount(itemAnalysis.getCorrectCount() + 1);
+                            } else {
+                                itemAnalysis.setIncorrectCount(itemAnalysis.getIncorrectCount() + 1);
+                            }
+                        } else {
+                            // Create a new item analysis
+                            ItemAnalysis newItemAnalysis = new ItemAnalysis();
+                            newItemAnalysis.setQuizid(quizId);
+                            newItemAnalysis.setItemNumber(lineNumber);
+                            if (isCorrect) {
+                                newItemAnalysis.setCorrectCount(1);
+                                newItemAnalysis.setIncorrectCount(0);
+                            } else {
+                                newItemAnalysis.setCorrectCount(0);
+                                newItemAnalysis.setIncorrectCount(1);
+                            }
+                            itemAnalysisMap.put(lineNumber, newItemAnalysis);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Save or update item analyses in the database
+        for (ItemAnalysis itemAnalysis : itemAnalysisMap.values()) {
+            itemAnalysisRepository.save(itemAnalysis);
+        }
+
+        // Update the score in the student quiz
+        studentQuiz.setScore(matchingAnswersCount);
+        studentQuizRepository.save(studentQuiz);
+    }
+
 }

@@ -107,14 +107,23 @@ public class StudentQuizController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<String> editStudentQuiz(@RequestBody EditStudentQuizRequest request) {
+    public ResponseEntity<Map<String, String>> editStudentQuiz(@RequestBody EditStudentQuizRequest request) {
         try {
+            // Edit the student quiz with the new text
             studentQuizService.editStudentQuiz(request.getStudentQuizId(), request.getNewText());
-            return new ResponseEntity<>("Student quiz updated successfully", HttpStatus.OK);
+
+            // Retrieve the updated student quiz
+            StudentQuiz updatedStudentQuiz = studentQuizService.getStudentQuiz(request.getStudentQuizId());
+
+            // Create response map
+            Map<String, String> response = new HashMap<>();
+            response.put("studentQuizId", updatedStudentQuiz.getStudentquizid());
+            response.put("newText", updatedStudentQuiz.getRecognizedtext());
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+            return new ResponseEntity<>(Map.of("message", e.getMessage()), HttpStatus.CONFLICT);
         } catch (IOException e) {
-            return new ResponseEntity<>("Error updating student quiz: " + e.getMessage(),
+            return new ResponseEntity<>(Map.of("message", "Error updating student quiz: " + e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
