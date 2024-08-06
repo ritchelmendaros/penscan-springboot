@@ -226,7 +226,10 @@ public class StudentQuizService {
         StudentQuiz studentQuiz = studentQuizOptional.get();
         String quizId = studentQuiz.getQuizid();
 
-        // Set the recognized text directly without normalization
+        // Get the current recognized text
+        String currentText = studentQuiz.getRecognizedtext();
+
+        // Set the recognized text to the new text
         studentQuiz.setRecognizedtext(newText);
 
         // Get the quiz and answer key
@@ -239,18 +242,45 @@ public class StudentQuizService {
         String[] answerKeyLines = answerKey.split("\\n");
 
         // Update the score and item analysis
-        int matchingAnswersCount = 0;
         Pattern pattern = Pattern.compile("^(\\d+)\\.\\s(.*)$");
-        List<ItemAnalysis> existingItemAnalyses = itemAnalysisRepository.findByQuizid(quizId);
 
         Map<Integer, ItemAnalysis> itemAnalysisMap = new HashMap<>();
+        List<ItemAnalysis> existingItemAnalyses = itemAnalysisRepository.findByQuizid(quizId);
         for (ItemAnalysis existingItemAnalysis : existingItemAnalyses) {
             itemAnalysisMap.put(existingItemAnalysis.getItemNumber(), existingItemAnalysis);
         }
 
-        String[] recognizedLines = newText.split("\\n");
-        for (String recognizedLine : recognizedLines) {
-            Matcher matcher = pattern.matcher(recognizedLine.trim());
+        // Process the current text to decrement counts
+        String[] currentLines = currentText.split("\\n");
+        for (String line : currentLines) {
+            Matcher matcher = pattern.matcher(line.trim());
+            if (matcher.find()) {
+                int lineNumber = Integer.parseInt(matcher.group(1));
+                String recognizedAnswer = matcher.group(2).trim();
+                if (lineNumber > 0 && lineNumber <= answerKeyLines.length) {
+                    Matcher answerMatcher = pattern.matcher(answerKeyLines[lineNumber - 1].trim());
+                    if (answerMatcher.find()) {
+                        String answerKeyAnswer = answerMatcher.group(2).trim();
+                        boolean isCorrect = recognizedAnswer.equalsIgnoreCase(answerKeyAnswer);
+                        ItemAnalysis itemAnalysis = itemAnalysisMap.get(lineNumber);
+                        if (itemAnalysis != null) {
+                            if (isCorrect) {
+                                itemAnalysis.setCorrectCount(itemAnalysis.getCorrectCount() - 1);
+                            } else {
+                                itemAnalysis.setIncorrectCount(itemAnalysis.getIncorrectCount() - 1);
+                            }
+                            itemAnalysisMap.put(lineNumber, itemAnalysis);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Process the new text to increment counts
+        String[] newLines = newText.split("\\n");
+        int matchingAnswersCount = 0;
+        for (String line : newLines) {
+            Matcher matcher = pattern.matcher(line.trim());
             if (matcher.find()) {
                 int lineNumber = Integer.parseInt(matcher.group(1));
                 String recognizedAnswer = matcher.group(2).trim();
@@ -263,33 +293,26 @@ public class StudentQuizService {
                             matchingAnswersCount++;
                         }
 
-                        // Update item analysis
-                        Optional<ItemAnalysis> existingItemAnalysis = existingItemAnalyses.stream()
-                                .filter(item -> item.getItemNumber() == lineNumber)
-                                .findFirst();
-
-                        if (existingItemAnalysis.isPresent()) {
-                            // Update existing item analysis
-                            ItemAnalysis itemAnalysis = existingItemAnalysis.get();
+                        ItemAnalysis itemAnalysis = itemAnalysisMap.get(lineNumber);
+                        if (itemAnalysis != null) {
                             if (isCorrect) {
                                 itemAnalysis.setCorrectCount(itemAnalysis.getCorrectCount() + 1);
                             } else {
                                 itemAnalysis.setIncorrectCount(itemAnalysis.getIncorrectCount() + 1);
                             }
                         } else {
-                            // Create a new item analysis
-                            ItemAnalysis newItemAnalysis = new ItemAnalysis();
-                            newItemAnalysis.setQuizid(quizId);
-                            newItemAnalysis.setItemNumber(lineNumber);
+                            itemAnalysis = new ItemAnalysis();
+                            itemAnalysis.setQuizid(quizId);
+                            itemAnalysis.setItemNumber(lineNumber);
                             if (isCorrect) {
-                                newItemAnalysis.setCorrectCount(1);
-                                newItemAnalysis.setIncorrectCount(0);
+                                itemAnalysis.setCorrectCount(1);
+                                itemAnalysis.setIncorrectCount(0);
                             } else {
-                                newItemAnalysis.setCorrectCount(0);
-                                newItemAnalysis.setIncorrectCount(1);
+                                itemAnalysis.setCorrectCount(0);
+                                itemAnalysis.setIncorrectCount(1);
                             }
-                            itemAnalysisMap.put(lineNumber, newItemAnalysis);
                         }
+                        itemAnalysisMap.put(lineNumber, itemAnalysis);
                     }
                 }
             }
@@ -304,5 +327,4 @@ public class StudentQuizService {
         studentQuiz.setScore(matchingAnswersCount);
         studentQuizRepository.save(studentQuiz);
     }
-
 }
