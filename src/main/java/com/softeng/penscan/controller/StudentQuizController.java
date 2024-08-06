@@ -38,6 +38,8 @@ public class StudentQuizController {
         try {
             String studentQuizId = studentQuizService.addStudentQuiz(quizid, image);
             return new ResponseEntity<>("Student quiz saved successfully with ID: " + studentQuizId, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         } catch (IOException | InterruptedException e) {
             return new ResponseEntity<>("Error saving student quiz: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);

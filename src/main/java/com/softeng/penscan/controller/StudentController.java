@@ -106,7 +106,7 @@ public class StudentController {
         } catch (Exception e) {
             String errorMessage = "Error getting quiz IDs and names for user with ID " + userId + " and class ID "
                     + classId;
-            QuizDTO errorDTO = new QuizDTO(null, null); // Or set appropriate default values
+            QuizDTO errorDTO = new QuizDTO(null, null); 
             List<QuizDTO> errorList = new ArrayList<>();
             errorList.add(errorDTO);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

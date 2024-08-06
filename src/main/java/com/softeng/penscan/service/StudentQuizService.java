@@ -47,11 +47,6 @@ public class StudentQuizService {
     private ItemAnalysisRepository itemAnalysisRepository;
 
     public String addStudentQuiz(String quizid, MultipartFile image) throws IOException, InterruptedException {
-
-        StudentQuiz studentQuiz = new StudentQuiz();
-        studentQuiz.setQuizid(quizid);
-        studentQuiz.setQuizimage(new Binary(BsonBinarySubType.BINARY, image.getBytes()));
-
         String recognizedText = azureTextRecognitionService.recognizeText(image);
 
         String normalizedText = normalizeRecognizedText(recognizedText);
@@ -70,7 +65,18 @@ public class StudentQuizService {
             throw new IllegalArgumentException("User not found with name: " + name);
         }
         User user = userOptional.get();
-        studentQuiz.setStudentid(user.getUserid());
+        String studentId = user.getUserid();
+
+        // Check if the student already has a quiz entry
+        Optional<StudentQuiz> existingStudentQuiz = studentQuizRepository.findByStudentidAndQuizid(studentId, quizid);
+        if (existingStudentQuiz.isPresent()) {
+            throw new IllegalArgumentException("Student already has a score for this quiz");
+        }
+
+        StudentQuiz studentQuiz = new StudentQuiz();
+        studentQuiz.setQuizid(quizid);
+        studentQuiz.setQuizimage(new Binary(BsonBinarySubType.BINARY, image.getBytes()));
+        studentQuiz.setStudentid(studentId);
         studentQuiz.setRecognizedtext(normalizedText);
 
         Optional<Quiz> quizOptional = quizRepository.findById(quizid);
@@ -215,5 +221,4 @@ public class StudentQuizService {
 
         return scoresAndStudentIds;
     }
-
 }

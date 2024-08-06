@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/item-analyses")
+@RequestMapping("/api/item-analysis")
 public class ItemAnalysisController {
 
     @Autowired
     private ItemAnalysisRepository itemAnalysisRepository;
 
     @GetMapping("/getitemanalysis")
-    public List<ItemAnalysis> getItemAnalysesByQuizId(@RequestParam("quizid") String quizId) {
+    public List<ItemAnalysis> getItemAnalysisByQuizId(@RequestParam("quizid") String quizId) {
         return itemAnalysisRepository.findByQuizid(quizId);
     }
 }
