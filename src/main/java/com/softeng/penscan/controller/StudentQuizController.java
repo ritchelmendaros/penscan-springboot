@@ -16,6 +16,7 @@ import com.softeng.penscan.model.User;
 import com.softeng.penscan.repository.StudentQuizRepository;
 import com.softeng.penscan.repository.UserRepository;
 import com.softeng.penscan.service.StudentQuizService;
+import com.softeng.penscan.utils.EditStudentQuizRequest;
 
 import java.io.IOException;
 
@@ -68,27 +69,33 @@ public class StudentQuizController {
     }
 
     @GetMapping("/getscoresandstudentids")
-    public ResponseEntity<Map<String, Map<String, Object>>> getScoresAndStudentIdsByQuizId(
+    public ResponseEntity<Map<String, Map<String, String>>> getScoresAndStudentIdsByQuizId(
             @RequestParam("quizid") String quizId) {
 
         List<StudentQuiz> studentQuizzes = studentQuizRepository.findByQuizid(quizId);
-        Map<String, Map<String, Object>> scoresAndStudentDetails = new HashMap<>();
+        Map<String, Map<String, String>> scoresAndStudentDetails = new HashMap<>();
 
         for (StudentQuiz studentQuiz : studentQuizzes) {
             String studentId = studentQuiz.getStudentid();
             int score = studentQuiz.getScore();
-            Map<String, Object> studentDetails = new HashMap<>();
+            Map<String, String> studentDetails = new HashMap<>();
 
             // Retrieve user details using student ID
             User user = userRepository.findByUserid(studentId);
             if (user != null) {
-                String firstName = user.getFirstname();
-                String lastName = user.getLastname();
+                String userId = user.getUserid(); // Get the user ID
+                String username = user.getUsername(); // Get the username
+                String firstName = user.getFirstname(); // Get the first name
+                String lastName = user.getLastname(); // Get the last name
+
+                // Add user details to the studentDetails map as text-only values
+                studentDetails.put("userId", userId);
+                studentDetails.put("username", username);
                 studentDetails.put("firstName", firstName);
                 studentDetails.put("lastName", lastName);
+                studentDetails.put("score", String.valueOf(score)); // Convert score to String
             }
 
-            studentDetails.put("score", score);
             scoresAndStudentDetails.put(studentId, studentDetails);
         }
 
@@ -96,6 +103,19 @@ public class StudentQuizController {
             return new ResponseEntity<>(scoresAndStudentDetails, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/edit")
+    public ResponseEntity<String> editStudentQuiz(@RequestBody EditStudentQuizRequest request) {
+        try {
+            studentQuizService.editStudentQuiz(request.getStudentQuizId(), request.getNewText());
+            return new ResponseEntity<>("Student quiz updated successfully", HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } catch (IOException e) {
+            return new ResponseEntity<>("Error updating student quiz: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
